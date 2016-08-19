@@ -1,6 +1,7 @@
 package vault
 
 import (
+	"encoding/json"
 	"errors"
 
 	vaultapi "github.com/hashicorp/vault/api"
@@ -35,6 +36,20 @@ func (v *Vault) ReadSecret(path string) (*vaultapi.Secret, error) {
 	return secret, nil
 }
 
+func (v *Vault) WriteSecret(path string, data []byte) (*vaultapi.Secret, error) {
+	var s map[string]interface{}
+	if err := json.Unmarshal(data, &s); err != nil {
+		return &vaultapi.Secret{}, err
+	}
+
+	vaultpath := "secret/" + path
+	secret, err := v.logical.Write(vaultpath, s)
+	if err != nil {
+		return &vaultapi.Secret{}, err
+	}
+	return secret, nil
+}
+
 func (v *Vault) ListSecrets(path string) ([]string, error) {
 	paths, err := v.logical.List(path)
 	if err != nil {
@@ -50,4 +65,24 @@ func (v *Vault) ListSecrets(path string) ([]string, error) {
 		return s, nil
 	}
 	return nil, errors.New("Error fetching vault secrets list")
+}
+
+type Secrets map[string]map[string]interface{}
+
+func (v *Vault) GetSecrets() (Secrets, error) {
+	secrets := make(Secrets)
+	keys, err := v.ListSecrets("/secret")
+	if err != nil {
+		return Secrets{}, nil
+	}
+
+	for _, key := range keys {
+		secret, err := v.ReadSecret("secret/" + key)
+		if err != nil {
+			return Secrets{}, nil
+		}
+		secrets[key] = secret.Data
+	}
+
+	return secrets, nil
 }
