@@ -73,13 +73,13 @@ func (s *Sync) release(sessionID string) error {
 }
 
 // Pull, Get latest secrets from vault and update local revisionID.
-func (s *Sync) Pull() error {
+func (s *Sync) Pull(force bool) error {
 	synced, revisions, err := s.isLatest()
 	if err != nil {
 		return err
 	}
 
-	if synced {
+	if !force && synced {
 		return errors.New(fmt.Sprintf("You have the latest copy of secrets: %s\n", revisions["local"]))
 	}
 
@@ -134,11 +134,10 @@ func (s *Sync) Push(key string) {
 	}
 
 	// Push bytes to vault
-	sec, err := s.vault.WriteSecret(key, data)
+	_, err = s.vault.WriteSecret(key, data)
 	if err != nil {
 		log.Panic(err)
 	}
-	fmt.Println("Secret has been updated: %s", sec)
 
 	if err = s.cache.UpdateRevision(sessionID); err != nil {
 		log.Panicf("Could not update cache revision: %s\n", err)
