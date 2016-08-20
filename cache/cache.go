@@ -10,8 +10,11 @@ type Cache struct {
 
 func New() (*Cache, error) {
 	cache := &Cache{}
-	if _, err := os.Stat(".cache/revision"); os.IsNotExist(err) {
-		return cache, cache.UpdateRevision("")
+	if _, err := os.Stat(".cache/"); os.IsNotExist(err) {
+		os.Mkdir(".cache/", 0777)
+		if _, err := os.Stat(".cache/revision"); os.IsNotExist(err) {
+			return cache, cache.UpdateRevision("")
+		}
 	}
 	return cache, nil
 }
