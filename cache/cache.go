@@ -27,23 +27,23 @@ func New(directory string) (*Cache, error) {
 	return cache, nil
 }
 
-func (c *Cache) Put(key, value []byte) error {
-	cacheDir := filepath.Join(c.basePath, string(key))
+func (c *Cache) Put(key string, value []byte) error {
+	cacheDir := filepath.Join(c.basePath, key)
 	return ioutil.WriteFile(cacheDir, value, 0644)
 }
 
-func (c *Cache) Get(key []byte) ([]byte, error) {
-	cacheDir := filepath.Join(c.basePath, string(key))
+func (c *Cache) Get(key string) ([]byte, error) {
+	cacheDir := filepath.Join(c.basePath, key)
 	return ioutil.ReadFile(cacheDir)
 }
 
 // Get Revision ID
 func (c *Cache) GetRevision() (string, error) {
-	b, err := c.Get([]byte(revision))
+	b, err := c.Get(revision)
 	return string(b), err
 }
 
 // Update Revision ID
 func (c *Cache) UpdateRevision(id string) error {
-	return c.Put([]byte(revision), []byte(id))
+	return c.Put(revision, []byte(id))
 }

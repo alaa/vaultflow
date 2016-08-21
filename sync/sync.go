@@ -94,7 +94,7 @@ func (s *Sync) Pull(force bool) error {
 			return err
 		}
 
-		if err = s.cache.Put([]byte(key), json); err != nil {
+		if err = s.cache.Put(key, json); err != nil {
 			return errors.New(fmt.Sprintf("Could not write secret to the cache: %s", err))
 		}
 	}
@@ -128,7 +128,7 @@ func (s *Sync) Push(key string) {
 		}
 	}(sessionID)
 
-	data, err := s.cache.Get([]byte(key))
+	data, err := s.cache.Get(key)
 	if err != nil {
 		log.Panic(err)
 	}
