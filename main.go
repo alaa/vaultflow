@@ -31,7 +31,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	cache, err := cache.New()
+	cache, err := cache.New(".cache2")
 	if err != nil {
 		log.Fatal(err)
 	}
