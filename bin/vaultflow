@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+
+docker run -e CONSUL_ADDR=$CONSUL_ADDR \
+           -e VAULT_TOKEN=$VAULT_TOKEN \
+           -e VAULT_ADDR=$VAULT_ADDR   \
+           -v $(pwd):/root             \
+           alaa/vaultflow "$@"
