@@ -89,7 +89,7 @@ func (s *Sync) Pull(force bool) error {
 	}
 
 	for key, secret := range secrets {
-		json, err := json.Marshal(secret)
+		json, err := json.MarshalIndent(secret, "", "  ")
 		if err != nil {
 			return err
 		}
