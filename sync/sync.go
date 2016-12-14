@@ -95,8 +95,10 @@ func (s *Sync) Pull(force bool) error {
 		}
 
 		if err = s.cache.Put(key, json); err != nil {
-			return errors.New(fmt.Sprintf("Could not write secret to the cache: %s", err))
+			return fmt.Errorf("Could not write secret to the cache: %s", err)
 		}
+
+		log.Printf("Got secret for %s\n", key)
 	}
 
 	if err = s.cache.UpdateRevision(revisions["remote"]); err != nil {
