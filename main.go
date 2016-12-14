@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"strings"
 
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 
@@ -16,7 +17,8 @@ var (
 	pullCommand       = kingpin.Command("pull", "pull latest secrets from vault.")
 	pullForceCommand  = pullCommand.Flag("force", "force pull secrets").Bool()
 	pushCommand       = kingpin.Command("push", "Push new secret to vault.")
-	pushSecretCommand = pushCommand.Flag("secret", "secret file name stored under .cache/ directory").Required().String()
+	pushSecretCommand = pushCommand.Flag("secret", "secret file name stored under vault-data/ directory").Required().String()
+	cachedir = kingpin.Flag("cache-dir", "cache directory").Default("vault-data").String()
 )
 
 func main() {
@@ -31,14 +33,18 @@ func main() {
 		log.Fatal(err)
 	}
 
-	cache, err := cache.New(".cache2")
+	opts := kingpin.Parse()
+
+	cache, err := cache.New(*cachedir)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	log.Printf("Using cache-dir=%s\n", *cachedir)
+
 	sync := sync.New(cache, consul, vault)
 
-	switch kingpin.Parse() {
+	switch opts {
 	case "pull":
 		_ = *pullCommand
 		if err := sync.Pull(*pullForceCommand); err != nil {
@@ -46,6 +52,8 @@ func main() {
 		}
 
 	case "push":
-		sync.Push(*pushSecretCommand)
+		key := strings.Replace(*pushSecretCommand, *cachedir + "/", "", 1)
+		log.Printf("Pushing %s to vault\n", key)
+		sync.Push(key)
 	}
 }

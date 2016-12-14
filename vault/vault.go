@@ -73,7 +73,7 @@ func (v *Vault) GetSecrets() (Secrets, error) {
 	secrets := make(Secrets)
 	keys, err := v.ListSecrets("/secret")
 	if err != nil {
-		return Secrets{}, nil
+		return Secrets{}, err;
 	}
 
 	for _, key := range keys {

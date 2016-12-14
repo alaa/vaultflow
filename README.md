@@ -6,6 +6,13 @@ Proposal workflow for managing secrets across a team.
 - Add YAML file configrations
 - Add local encryption options
 
+# build
+    make clean
+    make
+
+# build docker container
+    make docker
+
 # Misc
 ```docker run -it -p8500:8500 progrium/consul -server -bootstrap-expect 1```
 
