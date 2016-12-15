@@ -79,7 +79,7 @@ func (v *Vault) GetSecrets() (Secrets, error) {
 	for _, key := range keys {
 		secret, err := v.ReadSecret("secret/" + key)
 		if err != nil {
-			return Secrets{}, nil
+			return Secrets{}, err
 		}
 		secrets[key] = secret.Data
 	}
